@@ -42,6 +42,9 @@ $ docker run  -p 8888:8888 -v /root/mtahhan/triton-jupyter:/notebooks triton-jup
 ```
 Navigate to one of the URLs outputted above and the notebooks will be mounted in the container at `/notebooks`.
 
+Open a notebook and run it. An example of the output of [01-vector-add.pynb](./01-vector-add.ipynb) is shown below:
+
+![01-vector-add](./images/01-vector-add.png)
 
 ## Converting python files to Jupyter notebooks
 
