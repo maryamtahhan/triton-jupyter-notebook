@@ -46,6 +46,9 @@ Open a notebook and run it. An example of the output of [01-vector-add.pynb](./0
 
 ![01-vector-add](./images/01-vector-add.png)
 
+> **_NOTE_** Currently the only working example is [01-vector-add.pynb](./01-vector-add.ipynb),
+debug of the other notebooks is in progress.
+
 ## Converting python files to Jupyter notebooks
 
 ```
