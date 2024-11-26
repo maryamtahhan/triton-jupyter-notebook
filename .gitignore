@@ -1,0 +1,4 @@
+# Remove a few common types of files i.e. backup files
+*~
+*#
+.#*
