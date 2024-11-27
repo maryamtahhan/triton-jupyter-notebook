@@ -1,6 +1,4 @@
-# Use an official Python runtime as a parent image
-FROM registry.access.redhat.com/ubi9/python-312
-
+FROM registry.access.redhat.com/ubi9/python-312 AS base
 ARG USERNAME=1001
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
@@ -17,6 +15,9 @@ ENV PYTHON_VERSION=3.12 \
     PYTHONUNBUFFERED=1 \
     TRITON_CPU_BACKEND=1
 
+# Use an official Python runtime as a parent image
+FROM base AS build
+
 RUN dnf update -y && \
     dnf -y install clang cmake lld ninja-build;
 
@@ -28,20 +29,26 @@ WORKDIR /triton-cpu
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
-RUN pip install ninja cmake wheel pybind11 torch
+RUN pip install ninja cmake wheel pybind11
 RUN git submodule init
 RUN git submodule update
-RUN pip install -e python
-RUN pip install -e './python[tutorials]'
+ENV TRITON_WHEEL_VERSION_SUFFIX="-cpu"
+RUN pip wheel --wheel-dir=/wheelhouse -e python
+#RUN mv triton*.whl triton.whl
 
+FROM base
 
 # Install Jupyter Notebook
+RUN pip install --upgrade pip
 RUN pip install jupyter
-
+RUN pip install torch numpy matplotlib pandas tabulate scipy
+COPY --from=build /wheelhouse /wheelhouse
+RUN pip install --no-cache-dir /wheelhouse/*.whl
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
 WORKDIR /notebooks
+
 # Run Jupyter Notebook when the container launches
 CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
 
