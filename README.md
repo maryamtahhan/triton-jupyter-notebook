@@ -5,7 +5,7 @@ This is an example of how to run the triton-cpu examples in a container via Jupy
 ## Build the docker image
 
 ```bash
-docker build --build-arg USERNAME=$USER -t triton-jupyter -f Dockerfile .
+docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jupyter -f Dockerfile .
 ```
 
 ## Run the docker image
@@ -46,7 +46,7 @@ Open a notebook and run it. An example of the output of [01-vector-add.pynb](./0
 
 ![01-vector-add](./images/01-vector-add.png)
 
-> **_NOTE_** Currently the only working example is [01-vector-add.pynb](./01-vector-add.ipynb),
+> **_NOTE_** Currently the [02-fused-softmax-cpu.ipynb](./02-fused-softmax-cpu.ipynb) is broken.
 debug of the other notebooks is in progress.
 
 ## Converting python files to Jupyter notebooks

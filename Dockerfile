@@ -2,6 +2,7 @@ FROM registry.access.redhat.com/ubi9/python-312 AS base
 ARG USERNAME=1001
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
+ARG NPROC=4
 
 USER 0
 COPY user.sh user.sh
@@ -16,10 +17,11 @@ ENV PYTHON_VERSION=3.12 \
     TRITON_CPU_BACKEND=1
 
 # Use an official Python runtime as a parent image
-FROM base AS build
+FROM base AS triton-build
 
 RUN dnf update -y && \
-    dnf -y install clang cmake lld ninja-build;
+    dnf -y install clang cmake lld ninja-build && \
+    dnf clean all
 
 # Set the working directory to /app
 WORKDIR /
@@ -32,18 +34,56 @@ RUN pip install --upgrade setuptools
 RUN pip install ninja cmake wheel pybind11
 RUN git submodule init
 RUN git submodule update
-ENV TRITON_WHEEL_VERSION_SUFFIX="-cpu"
 RUN pip wheel --wheel-dir=/wheelhouse -e python
-#RUN mv triton*.whl triton.whl
+
+FROM base AS pytorch-build
+
+# Install dependencies
+RUN dnf update -y && dnf install -y \
+    git cmake gcc gcc-c++ python3 python3-pip ninja-build \
+    openblas-devel zlib-devel \
+    llvm clang && \
+    dnf install -y https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/Packages/eigen3-devel-3.4.0-2.el9.noarch.rpm && \
+    dnf clean all
+
+# Clone PyTorch source with submodules
+RUN git clone --recursive https://github.com/pytorch/pytorch.git /workspace/pytorch
+
+COPY --from=triton-build /wheelhouse /wheelhouse
+RUN pip install /wheelhouse/*.whl
+WORKDIR /workspace/pytorch
+RUN pip install -r requirements.txt
+RUN pip install ninja cmake rust mkl-static mkl-include
+
+# Set environment variables for CPU-only PyTorch build
+ENV USE_CUDA=0 \
+    USE_MPS=0 \
+    USE_ROCM=0 \
+    BUILD_TEST=0 \
+    USE_DISTRIBUTED=0 \
+    USE_TENSORRT=0 \
+    USE_QNNPACK=0 \
+    USE_FBGEMM=0 \
+    MAX_JOBS=$NPROC \
+    TRITON_PATH="/opt/app-root/lib64/python3.12/site-packages/triton"
+
+RUN python setup.py clean
+RUN python setup.py bdist_wheel
 
 FROM base
 
 # Install Jupyter Notebook
+RUN dnf install -y openblas openblas-devel llvm llvm-libs libomp libomp-devel && \
+    dnf clean all
 RUN pip install --upgrade pip
 RUN pip install jupyter
 RUN pip install torch numpy matplotlib pandas tabulate scipy
-COPY --from=build /wheelhouse /wheelhouse
+COPY --from=triton-build /wheelhouse /wheelhouse
 RUN pip install --no-cache-dir /wheelhouse/*.whl
+COPY --from=pytorch-build /workspace/pytorch/dist /pytorch/dist
+RUN pip install --no-cache-dir /pytorch/dist/*.whl
+RUN echo 'export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
@@ -52,4 +92,4 @@ WORKDIR /notebooks
 # Run Jupyter Notebook when the container launches
 CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
 
-# docker build --build-arg USERNAME=$USER -t triton-jupyter -f Dockerfile .
+# docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jupyter -f Dockerfile .
