@@ -11,7 +11,7 @@ docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jup
 ## Run the docker image
 
 ```bash
-$ docker run  -p 8888:8888 -v /root/mtahhan/triton-jupyter:/notebooks triton-jupyter
+$ docker run  -p 8888:8888 -v /<path-to-dir>/triton-jupyter:/notebooks triton-jupyter
 [I 2024-11-26 16:57:27.709 ServerApp] jupyter_lsp | extension was successfully linked.
 [I 2024-11-26 16:57:27.716 ServerApp] jupyter_server_terminals | extension was successfully linked.
 [I 2024-11-26 16:57:27.723 ServerApp] jupyterlab | extension was successfully linked.
@@ -46,7 +46,7 @@ Open a notebook and run it. An example of the output of [01-vector-add.pynb](./0
 
 ![01-vector-add](./images/01-vector-add.png)
 
-> **_NOTE_** Currently the [02-fused-softmax-cpu.ipynb](./02-fused-softmax-cpu.ipynb) is broken.
+> **_NOTE_** A CPU with AVX512 is needed to run [02-fused-softmax-cpu.ipynb](./02-fused-softmax-cpu.ipynb).
 debug of the other notebooks is in progress.
 
 ## Converting python files to Jupyter notebooks
