@@ -1,0 +1,16 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/mwouts/jupytext
+    rev: v1.14.7  # CURRENT_TAG/COMMIT_HASH
+    hooks:
+    - id: jupytext
+      args: [--sync, --pipe, black]
+      additional_dependencies:
+        - black==22.8.0 # Matches hook
+  - repo: https://github.com/psf/black
+    rev:  22.8.0
+    hooks:
+    - id: black
+      language_version: python3
+exclude: local-venv/*

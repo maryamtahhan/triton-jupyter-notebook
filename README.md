@@ -4,8 +4,10 @@ This is an example of how to run the triton-cpu examples in a container via Jupy
 
 ## Build the docker image
 
+### Triton CPU
+
 ```bash
-docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jupyter -f Dockerfile .
+docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jupyter -f Dockerfile.triton-cpu .
 ```
 
 ## Run the docker image
