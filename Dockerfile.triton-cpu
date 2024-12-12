@@ -70,7 +70,7 @@ ENV USE_CUDA=0 \
 RUN python setup.py clean
 RUN python setup.py bdist_wheel
 
-FROM base
+FROM base  AS final
 
 # Install Jupyter Notebook
 RUN dnf install -y openblas openblas-devel llvm llvm-libs libomp libomp-devel && \
@@ -91,5 +91,3 @@ WORKDIR /notebooks
 
 # Run Jupyter Notebook when the container launches
 CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
-
-# docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jupyter -f Dockerfile .

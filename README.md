@@ -2,18 +2,27 @@
 
 This is an example of how to run the triton-cpu examples in a container via Jupyter notebooks.
 
+## Prerequisites
+
+* **Docker** or **Podman**
+* **NVIDIA Container Toolkit for GPU Usage**
+* **VSCode Dev Containers Extension**
+
+> **_NOTE_**: If you are using an NVIDIA GPU, you also need to complete the steps
+  to install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+
 ## Build the docker image
 
 ### Triton CPU
 
 ```bash
-docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-jupyter -f Dockerfile.triton-cpu .
+docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-cpu-jupyter -f Dockerfile.triton-cpu .
 ```
 
 ## Run the docker image
 
 ```bash
-$ docker run  -p 8888:8888 -v /<path-to-dir>/triton-jupyter:/notebooks triton-jupyter
+$ docker run  -p 8888:8888 -v /<path-to-dir>/triton-jupyter/notebooks:/notebooks triton-jupyter
 [I 2024-11-26 16:57:27.709 ServerApp] jupyter_lsp | extension was successfully linked.
 [I 2024-11-26 16:57:27.716 ServerApp] jupyter_server_terminals | extension was successfully linked.
 [I 2024-11-26 16:57:27.723 ServerApp] jupyterlab | extension was successfully linked.
