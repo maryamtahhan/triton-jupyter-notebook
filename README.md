@@ -6,7 +6,6 @@ This is an example of how to run the triton-cpu examples in a container via Jupy
 
 * **Docker** or **Podman**
 * **NVIDIA Container Toolkit for GPU Usage**
-* **VSCode Dev Containers Extension**
 
 > **_NOTE_**: If you are using an NVIDIA GPU, you also need to complete the steps
   to install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
