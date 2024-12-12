@@ -13,16 +13,22 @@ This is an example of how to run the triton-cpu examples in a container via Jupy
 
 ## Build the docker image
 
+### Triton
+
+```bash
+make triton-image
+```
+
 ### Triton CPU
 
 ```bash
-docker build --build-arg USERNAME=$USER --build-arg NPROC=$(nproc) -t triton-cpu-jupyter -f Dockerfile.triton-cpu .
+make triton-cpu-image
 ```
 
 ## Run the docker image
 
 ```bash
-$ docker run  -p 8888:8888 -v /<path-to-dir>/triton-jupyter/notebooks:/notebooks triton-jupyter
+$ make triton-run # OR make triton-cpu-run
 [I 2024-11-26 16:57:27.709 ServerApp] jupyter_lsp | extension was successfully linked.
 [I 2024-11-26 16:57:27.716 ServerApp] jupyter_server_terminals | extension was successfully linked.
 [I 2024-11-26 16:57:27.723 ServerApp] jupyterlab | extension was successfully linked.
@@ -51,6 +57,7 @@ $ docker run  -p 8888:8888 -v /<path-to-dir>/triton-jupyter/notebooks:/notebooks
         http://127.0.0.1:8888/tree?token=74cbac9d4ae95aff21362227b0d94cb96951d3bbf372cc9b
 [I 2024-11-26 16:57:28.732 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
 ```
+
 Navigate to one of the URLs outputted above and the notebooks will be mounted in the container at `/notebooks`.
 
 Open a notebook and run it. An example of the output of [01-vector-add.pynb](./01-vector-add.ipynb) is shown below:
@@ -58,7 +65,6 @@ Open a notebook and run it. An example of the output of [01-vector-add.pynb](./0
 ![01-vector-add](./images/01-vector-add.png)
 
 > **_NOTE_** A CPU with AVX512 is needed to run [02-fused-softmax-cpu.ipynb](./02-fused-softmax-cpu.ipynb).
-debug of the other notebooks is in progress.
 
 ## Converting python files to Jupyter notebooks
 
