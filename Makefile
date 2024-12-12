@@ -23,6 +23,10 @@ mkfile_path=$(abspath $(lastword $(MAKEFILE_LIST)))
 source_dir=$(shell dirname "$(mkfile_path)")
 USERNAME=$(shell echo $(USER) | tr A-Z a-z)
 NPROC=$(shell nproc)
+IMAGE_REPO ?= quay.io/mtahhan
+IMAGE_NAME ?= triton-jupyter
+TRITON_TAG         ?= triton-latest
+TRITON_CPU_TAG     ?= triton-cpu-latest
 export CTR_CMD?=$(or $(shell command -v podman), $(shell command -v docker))
 
 ##@ Container build.
@@ -31,17 +35,17 @@ image-builder-check:
 
 all: triton-image triton-cpu-image
 
-triton-image: image-builder-check
-	$(CTR_CMD) build -t triton-jupyter --build-arg USERNAME=${USER} \
+triton-image: image-builder-check ## Build the triton jupyter notebook image
+	$(CTR_CMD) build -t $(IMAGE_REPO)/$(IMAGE_NAME):$(TRITON_TAG) --build-arg USERNAME=${USER} \
  --build-arg NPROC=${NPROC} -f Dockerfile.triton .
 
-triton-cpu-image: image-builder-check
-	$(CTR_CMD) build -t triton-cpu-jupyter --build-arg USERNAME=${USER} \
+triton-cpu-image: image-builder-check ## Build the triton-cpu jupyter notebook image
+	$(CTR_CMD) build -t $(IMAGE_REPO)/$(IMAGE_NAME):$(TRITON_CPU_TAG) --build-arg USERNAME=${USER} \
  --build-arg NPROC=${NPROC} -f Dockerfile.triton-cpu .
 
-triton-run: image-builder-check
-	$(CTR_CMD) run --runtime=nvidia --gpus=all -p 8888:8888 -v ${source_dir}/notebooks:/notebooks triton-jupyter
+triton-run: image-builder-check ## Run the triton jupyter notebook image
+	$(CTR_CMD) run --runtime=nvidia --gpus=all -p 8888:8888 -v ${source_dir}/notebooks:/notebooks $(IMAGE_REPO)/$(IMAGE_NAME):$(TRITON_TAG)
 
-triton-cpu-run: image-builder-check
-	$(CTR_CMD) run -p 8888:8888 -v ${source_dir}/notebooks:/notebooks triton-jupyter
+triton-cpu-run: image-builder-check ## Run the triton-cpu jupyter notebook image
+	$(CTR_CMD) run -p 8888:8888 -v ${source_dir}/notebooks:/notebooks $(IMAGE_REPO)/$(IMAGE_NAME):$(TRITON_CPU_TAG)
 
