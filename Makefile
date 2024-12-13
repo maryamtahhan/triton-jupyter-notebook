@@ -26,7 +26,7 @@ NPROC=$(shell nproc)
 IMAGE_REPO ?= quay.io/mtahhan
 IMAGE_NAME ?= triton-jupyter
 TRITON_TAG         ?= triton-latest
-TRITON_CPU_TAG     ?= triton-cpu-latest
+TRITON_CPU_TAG     ?= cpu-latest
 export CTR_CMD?=$(or $(shell command -v podman), $(shell command -v docker))
 
 ##@ Container build.
